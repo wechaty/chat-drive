@@ -1,6 +1,7 @@
 import { Message } from 'wechaty'
 import parseDate from './parse-date'
 import parseNumber from './parse-number'
+import keywordsGenerate from './keywords-generate'
 
 interface DriveAction {
   action: 'search' | 'list' | 'reply',
@@ -86,19 +87,21 @@ function actionToQuery (text: string, action: DriveAction): string|null {
   }
   if (action.action === 'search' && action.keywords) {
     const keywords = action.keywords.replace("'", '')
+    const ands: string[] = []
+    ands.push(keywordsGenerate(keywords))
+
     if (action.dateRange) {
-      return `(name contains '${keywords}' or fullText contains '${keywords}') and createdTime >= '${action.dateRange[0]}T00:00:00' and createdTime <= '${action.dateRange[1]}T23:59:59'`
-    }
-    if (action.date) {
+      ands.push(`(createdTime >= '${action.dateRange[0]}T00:00:00' and createdTime <= '${action.dateRange[1]}T23:59:59')`)
+    } else if (action.date) {
       if (AfterRe.test(text)) {
-        return `(name contains '${keywords}' or fullText contains '${keywords}') and createdTime >= '${action.date}T00:00:00'`
+        ands.push(`(createdTime >= '${action.date}T00:00:00')`)
+      } else if (BeforeRe.test(text)) {
+        ands.push(`(createdTime <= '${action.date}T23:59:59')`)
+      } else {
+        ands.push(`(createdTime >= '${action.date}T00:00:00' and createdTime <= '${action.date}T23:59:59')`)
       }
-      if (BeforeRe.test(text)) {
-        return `(name contains '${keywords}' or fullText contains '${keywords}') and createdTime <= '${action.date}T23:59:59'`
-      }
-      return `(name contains '${keywords}' or fullText contains '${keywords}') and createdTime >= '${action.date}T00:00:00' and createdTime <= '${action.date}T23:59:59'`
     }
-    return `name contains '${keywords}' or fullText contains '${keywords}'`
+    return ands.join(' and ')
   }
   return null
 }
