@@ -18,4 +18,10 @@ export class GoogleDriver extends BaseDriver {
     return []
   }
 
+  public async getFile (key: string): Promise<FileBox> {
+    log.verbose(PRE, `getFile(${key})`)
+    // TODO: wait for Huan to fill in this logic
+    throw new Error('Not implemented')
+  }
+
 }

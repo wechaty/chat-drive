@@ -19,4 +19,10 @@ export class FSDriver extends BaseDriver {
     return []
   }
 
+  public async getFile (key: string): Promise<FileBox> {
+    log.verbose(PRE, `getFile(${key})`)
+    // TODO: wait for Yuan to fill in this logic
+    throw new Error('Not implemented')
+  }
+
 }
