@@ -64,10 +64,10 @@ export function matchResponse (text: string): DriveAction | null {
   return null
 }
 
-export default function driveResponse (message: Message) {
+export default async function driveResponse (message: Message) {
   const text = message.text()
   const response = matchResponse(text)
   if (response) {
-    message.say(JSON.stringify(response))
+    await message.say(JSON.stringify(response))
   }
 }
