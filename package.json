@@ -20,7 +20,8 @@
   "homepage": "https://github.com/wechaty/chat-drive#readme",
   "dependencies": {
     "brolog": "^1.12.4",
-    "wechaty": "^0.48.10"
+    "wechaty": "^0.48.10",
+    "wechaty-plugin-contrib": "^0.14.15"
   },
   "git": {
     "scripts": {
