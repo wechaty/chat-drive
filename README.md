@@ -1,5 +1,18 @@
 # chat-drive
 
+Chat Drive is a conversational storage solution that allows you to save files from the WeChat room and access them anytime by talking to our chatbot.
+
+## The Motivation
+
+Once upon a time...
+
+## Features
+
+1. Save all files in a WeChat room to GDrive
+1. Search and get back the saved files by talking to the chatbot
+
+## Usage
+
 ## Google Drive API
 
 ### How to create a Service Account
@@ -30,6 +43,16 @@
 1. [Wrapper to simplify interaction with google drive apis](https://github.com/rainabba/node-cloudfs-drive)
 1. [Node.js library to access Google Drive's API](https://github.com/niftylettuce/node-google-drive)
 
+## Contributors
+
+[![](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/0)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/0)[![](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/1)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/1)[![](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/2)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/2)[![](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/3)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/3)[![](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/4)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/4)[![](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/5)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/5)[![](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/6)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/6)[![](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/7)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/7)
+
 ## Creators
 
 Rui, Duan, Yuan, and Huan
+
+## Copyright & License
+
+- Code & Docs © 2020 Wechaty Contributors (<https://github.com/wechaty>)
+- Code released under the Apache-2.0 License
+- Docs released under Creative Commons
