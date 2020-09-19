@@ -13,3 +13,4 @@ bot.use(
 bot
   .on('message', messageListener)
   .start()
+  .catch(console.error)
