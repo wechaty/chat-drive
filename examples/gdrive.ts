@@ -31,17 +31,17 @@ const drive = google.drive({
 //   const res = await drive.files.delete()
 // }
 
-async function filePathToId (filePath: string): Promise<string> {
-  const params = {
-    fields: 'files(id)',
-    pageSize: 1,
-    q: "mimeType='image/jpeg'",
-    // mimeType = 'application/vnd.google-apps.folder'
-    // name = 'hello'
-  }
-  const res = await drive.files.list(params)
-  console.info(res.data.files!.map(f => f.parents))
-}
+// async function filePathToId (filePath: string): Promise<string> {
+//   const params = {
+//     fields: 'files(id)',
+//     pageSize: 1,
+//     q: "mimeType='image/jpeg'",
+//     // mimeType = 'application/vnd.google-apps.folder'
+//     // name = 'hello'
+//   }
+//   const res = await drive.files.list(params)
+//   console.info(res.data.files!.map(f => f.parents))
+// }
 
 async function fileIdToFileBox (
   fileId: string,
@@ -73,7 +73,6 @@ async function list () {
 
 // mimeType: 'application/vnd.google-apps.folder',
 
-
 async function upload () {
   // Obtain user credentials to use for the request
   const fileName = 't.ts'
@@ -99,6 +98,7 @@ async function upload () {
 
 async function main () {
   void upload
+  void fileIdToFileBox
   // await upload()
   await list()
 }
