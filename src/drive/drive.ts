@@ -1,8 +1,10 @@
 import { FileBox } from 'wechaty'
 
-import { log } from '../config'
+import { BaseDriver } from './drivers/baseDriver'
+import { FSDriver } from './drivers/fsDriver'
+import { GoogleDriver } from './drivers/googleDriver'
 
-const PRE = 'Drive'
+export type DriverType = 'google' | 'fs'
 
 export class Drive {
 
@@ -13,25 +15,29 @@ export class Drive {
     }
   }
 
-  public async searchFile (args: any) {
-    const searchResults = await this.searchFileInGoogleDrive(args)
-    return searchResults
+  private driver: BaseDriver
+
+  public constructor (driverType = 'fs') {
+    switch (driverType) {
+      case 'fs':
+        this.driver = new FSDriver()
+        break
+
+      case 'google':
+        this.driver = new GoogleDriver()
+        break
+
+      default:
+        throw new Error(`Unsupported driver type: ${driverType}, can not create drive with it.`)
+    }
   }
 
-  private async checkFileInGoogleDrive (file: FileBox): Promise<boolean> {
-    log.verbose(PRE, `checkFileInGoogleDrive(${file})`)
-    // TODO: to be filled by Huan
-    return false
+  public async saveFile (path: string, fileBox: FileBox) {
+    await this.driver.saveFile(path, fileBox)
   }
 
-  private async saveFileToGoogleDrive (file: FileBox) {
-    log.verbose(PRE, `saveFileToGoogleDrive(${file})`)
-    // TODO: to be filled by Huan
-  }
-
-  private async searchFileInGoogleDrive (args: any) {
-    log.verbose(PRE, `searchFileInGoogleDrive(${args})`)
-    // TODO: to be filled by Huan
+  public async searchFile (path: string, query: string) {
+    return this.driver.searchFile(path, query)
   }
 
 }
