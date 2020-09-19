@@ -28,13 +28,14 @@
   },
   "homepage": "https://github.com/wechaty/chat-drive#readme",
   "dependencies": {
-    "brolog": "^1.12.4",
-    "tstest": "^0.4.10",
-    "wechaty": "^0.48.10",
-    "wechaty-plugin-contrib": "^0.14.15",
     "@microsoft/recognizers-text-date-time": "^1.3.0",
     "@microsoft/recognizers-text-number": "^1.3.0",
-    "@microsoft/recognizers-text-suite": "^1.3.0"
+    "@microsoft/recognizers-text-suite": "^1.3.0",
+    "brolog": "^1.12.4",
+    "nodejieba": "^2.4.1",
+    "tstest": "^0.4.10",
+    "wechaty": "^0.48.10",
+    "wechaty-plugin-contrib": "^0.14.15"
   },
   "git": {
     "scripts": {
