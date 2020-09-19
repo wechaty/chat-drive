@@ -8,13 +8,6 @@ export type DriverType = 'google' | 'fs'
 
 export class Drive {
 
-  public async saveFile (fileBox: FileBox) {
-    const fileExists = await this.checkFileInGoogleDrive(fileBox)
-    if (!fileExists) {
-      await this.saveFileToGoogleDrive(fileBox)
-    }
-  }
-
   private driver: BaseDriver
 
   public constructor (driverType = 'fs') {
