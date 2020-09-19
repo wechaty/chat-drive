@@ -12,9 +12,7 @@ interface DateResult {
 }
 
 /**
- * 
  * @param text
- * 
  *   {
       "start": 2,
       "end": 5,
@@ -42,14 +40,14 @@ export default function parseDate (text: string): DateResult|null {
     const before = text.slice(0, result[0].start)
     const after = text.slice(result[0].end + 1)
 
-    if (result[0].resolution.values[0].hasOwnProperty('value')) {
+    if (result[0].resolution.values[0].value) {
       return {
         clean: before + after,
         date: result[0].resolution.values[0].value,
       }
     }
 
-    if (result[0].resolution.values[0].hasOwnProperty('start')) {
+    if (result[0].resolution.values[0].start) {
       return {
         clean: before + after,
         dateRange: [
@@ -63,4 +61,4 @@ export default function parseDate (text: string): DateResult|null {
 }
 
 // console.log(JSON.stringify(model.parse('查找9月12的汽车'), null, 4))
-console.log(JSON.stringify(model.parse('查找上周微信生态的文件'), null, 4))
+// console.log(JSON.stringify(model.parse('查找上周微信生态的文件'), null, 4))
