@@ -4,6 +4,11 @@ import { log } from '../config'
 
 const PRE = 'Drive'
 
+export interface DriveFile {
+  name: string,
+  path: string,
+}
+
 export class Drive {
 
   public async saveFile (path: string, fileBox: FileBox) {
@@ -20,9 +25,10 @@ export class Drive {
     // TODO: to be filled by Huan
   }
 
-  private async searchFileInGoogleDrive (path: string, query: string) {
+  private async searchFileInGoogleDrive (path: string, query: string): Promise<DriveFile[]> {
     log.verbose(PRE, `searchFileInGoogleDrive(${path}, ${query})`)
     // TODO: to be filled by Huan
+    return []
   }
 
 }
