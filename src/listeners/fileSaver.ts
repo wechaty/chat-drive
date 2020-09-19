@@ -1,15 +1,14 @@
 import { Message } from 'wechaty'
 
 import { log } from '../config'
-import { Drive } from '../drive'
+import { DriveManager } from '../drive/driveManager'
 
 const PRE = 'fileSaverListener'
-const drive = new Drive()
+const manager = new DriveManager()
 
 export const fileSaverListener = async (message: Message) => {
   if (message.type() === Message.Type.Attachment) {
     log.verbose(PRE, 'Saving file to drive...')
-    const messageFileBox = await message.toFileBox()
-    await drive.saveFile(messageFileBox)
+    await manager.saveFileInMessage(message)
   }
 }
