@@ -31,7 +31,10 @@
     "brolog": "^1.12.4",
     "tstest": "^0.4.10",
     "wechaty": "^0.48.10",
-    "wechaty-plugin-contrib": "^0.14.15"
+    "wechaty-plugin-contrib": "^0.14.15",
+    "@microsoft/recognizers-text-date-time": "^1.3.0",
+    "@microsoft/recognizers-text-number": "^1.3.0",
+    "@microsoft/recognizers-text-suite": "^1.3.0"
   },
   "git": {
     "scripts": {
