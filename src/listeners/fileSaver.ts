@@ -8,7 +8,7 @@ const drive = new Drive()
 
 export const fileSaverListener = async (message: Message) => {
   if (message.type() === Message.Type.Attachment) {
-    log.verbose(PRE, `Saving file to drive...`)
+    log.verbose(PRE, 'Saving file to drive...')
     const messageFileBox = await message.toFileBox()
     await drive.saveFile(messageFileBox)
   }
