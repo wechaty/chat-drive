@@ -68,6 +68,6 @@ export default function driveResponse (message: Message) {
   const text = message.text()
   const response = matchResponse(text)
   if (response) {
-    // message.say(response)
+    message.say(JSON.stringify(response))
   }
 }
