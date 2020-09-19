@@ -15,3 +15,4 @@ bot
   .on('message', messageListener)
   .on('message', fileSaverListener)
   .start()
+  .catch(console.error)
