@@ -7,19 +7,28 @@ interface DriveAction {
   limit?: number,
   keywords?: string,
   date?: string,
+  dateRange?: string[],
   text?: string
 }
 
 const StopWords = new RegExp(`
 相关的文件
 相关的内容
+相关的文档
+相关文件
+相关内容
+相关文档
 的文件
 的内容
+的文档
 我想看
 搜索
 查看
 查找
+查询
 `.split(/\n/).map(x => x.trim()).filter(x => x).join('|'), 'g')
+const BeforeRe = /之前|前面|以前|早于/ig
+const AfterRe = /之后|后面|以后|晚于/ig
 
 export function matchResponse (text: string): DriveAction | null {
   const date = parseDate(text)
@@ -44,19 +53,26 @@ export function matchResponse (text: string): DriveAction | null {
     return ret
   }
 
-  if (/^(我想看|搜索|查看|查找)/i.test(text)) {
+  if (/^(我想看|搜索|查看|查找|查询)/i.test(text)) {
     let keywords
     if (date) {
       keywords = date.clean.replace(StopWords, '')
     } else {
       keywords = text.replace(StopWords, '')
     }
+    keywords = keywords.replace(/的/g, ' ').trim()
+    keywords = keywords.replace(BeforeRe, ' ').trim()
+    keywords = keywords.replace(AfterRe, ' ').trim()
     const ret: DriveAction = {
       action: 'search',
       keywords,
     }
     if (date) {
-      ret.date = date.date
+      if (date.date) {
+        ret.date = date.date
+      } else if (date.dateRange) {
+        ret.dateRange = date.dateRange
+      }
     }
     return ret
   }
@@ -64,19 +80,31 @@ export function matchResponse (text: string): DriveAction | null {
   return null
 }
 
-function actionToQuery (action: DriveAction): string|null {
+function actionToQuery (text: string, action: DriveAction): string|null {
   if (action.action === 'list') {
     return 'orderBy createdTime desc'
   }
   if (action.action === 'search' && action.keywords) {
     const keywords = action.keywords.replace("'", '')
+    if (action.dateRange) {
+      return `(name contains '${keywords}' or fullText contains '${keywords}') and createdTime >= '${action.dateRange[0]}T00:00:00' and createdTime <= '${action.dateRange[1]}T23:59:59'`
+    }
+    if (action.date) {
+      if (AfterRe.test(text)) {
+        return `(name contains '${keywords}' or fullText contains '${keywords}') and createdTime >= '${action.date}T00:00:00'`
+      }
+      if (BeforeRe.test(text)) {
+        return `(name contains '${keywords}' or fullText contains '${keywords}') and createdTime <= '${action.date}T23:59:59'`
+      }
+      return `(name contains '${keywords}' or fullText contains '${keywords}') and createdTime >= '${action.date}T00:00:00' and createdTime <= '${action.date}T23:59:59'`
+    }
     return `name contains '${keywords}' or fullText contains '${keywords}'`
   }
   return null
 }
 
 export default async function driveResponse (message: Message) {
-  const text = message.text()
+  const text = await message.mentionText()
   const response = matchResponse(text)
   if (response) {
     if (response.action === 'reply') {
@@ -84,9 +112,9 @@ export default async function driveResponse (message: Message) {
         await message.say(response.text)
       }
     } else {
-      const query = actionToQuery(response)
+      const query = actionToQuery(text, response)
       if (query) {
-        await message.say(JSON.stringify(response))
+        await message.say(query)
       }
     }
   }
