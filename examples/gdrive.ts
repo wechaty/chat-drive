@@ -27,21 +27,25 @@ const drive = google.drive({
   version: 'v3',
 })
 
-// async function del () {
-//   const res = await drive.files.delete()
-// }
+async function del (fileId: string): Promise<void> {
+  await drive.files.delete({
+    fileId,
+  })
+}
 
-// async function filePathToId (filePath: string): Promise<string> {
-//   const params = {
-//     fields: 'files(id)',
-//     pageSize: 1,
-//     q: "mimeType='image/jpeg'",
-//     // mimeType = 'application/vnd.google-apps.folder'
-//     // name = 'hello'
-//   }
-//   const res = await drive.files.list(params)
-//   console.info(res.data.files!.map(f => f.parents))
-// }
+async function filePathToId (filePath: string): Promise<string> {
+  const params = {
+    fields: 'files(id)',
+    pageSize: 1,
+    q: `properties.chatDrivePath has \\'${filePath}\\'`,
+    spaces: 'drive',
+    // mimeType = 'application/vnd.google-apps.folder'
+    // name = 'hello'
+  }
+  const res = await drive.files.list(params)
+  console.info(res.data.files!.map(f => f.parents))
+  return 'id'
+}
 
 async function fileIdToFileBox (
   fileId: string,
@@ -61,21 +65,48 @@ async function fileIdToFileBox (
   return FileBox.fromStream(res.data, name)
 }
 
-async function list () {
+const validId = (id: undefined | null | string): id is string => !!id
+
+async function listFiles (): Promise<string[]> {
   const res = await drive.files.list({
-    // fields: 'files(name, webViewLink)',
+    // fields: 'files(name, properties)',
     fields: '*',
-    orderBy: 'createdTime desc',
-    pageSize: 5,
+    pageSize: 50,
+    q: "trashed != true and mimeType != 'application/vnd.google-apps.folder'",
   })
-  console.info(res.data.files!.map(f => f.parents))
+
+  const idList = res.data.files?.map(f => f.id) || []
+
+  return idList.filter(validId)
 }
 
+async function list (q?: string): Promise<string[]> {
+  const res = await drive.files.list({
+    fields: 'files(id)',
+    // pageSize: 50,
+    q: q ?? 'not trashed',
+  })
+  const idList = res.data.files?.map(f => f.id) || []
+  return idList.filter(validId)
+}
+
+async function fileIdToSchema (fileId: string) {
+  const ret = await drive.files.get({
+    fields: '*',
+    fileId,
+  })
+  return ret.data
+}
 // mimeType: 'application/vnd.google-apps.folder',
 
+/**
+ * Google Driver API - Files: create
+ *  https://developers.google.com/drive/api/v3/reference/files/create
+ *
+ */
 async function upload () {
   // Obtain user credentials to use for the request
-  const fileName = 't.ts'
+  const fileName = 'gdrive.ts'
   // const fileSize = fs.statSync(fileName).size
 
   const res = await drive.files.create(
@@ -87,7 +118,11 @@ async function upload () {
         // a requestBody element is required if you want to use multipart
         mimeType: 'text/plain', // mimeType at Google Drive
         name: fileName,
+        originalFilename: `/123@chatroom/456/${fileName}`,
         parents: ['1eQmnWldXtMu0p1jBhOaUi1po9jZlUpDP'],
+        properties: {
+          chatDrivePath: '/123@chatroom/456/',
+        },
       },
       // resource: metadata,
     },
@@ -97,11 +132,30 @@ async function upload () {
 }
 
 async function main () {
-  void upload
-  void fileIdToFileBox
   // await upload()
-  await list()
+  const idList = await list("name contains 'gdrive'")
+  console.info('idList', idList)
+
+  for (const fileId of idList) {
+    console.info('schema for ', fileId, await fileIdToSchema(fileId))
+  }
+
+  // for (const id of idList) {
+  //   if (id !== '1eQmnWldXtMu0p1jBhOaUi1po9jZlUpDP') { // skip `ChatDrive`
+  //     await del(id)
+  //   }
+  // }
+
+  // const id = await filePathToId('/123@chatroom/456')
+  // console.info('id', id)
 }
 
 main()
   .catch(console.error)
+
+void upload
+void fileIdToFileBox
+void list
+void filePathToId
+void listFiles
+void del
