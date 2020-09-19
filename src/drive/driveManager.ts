@@ -11,24 +11,24 @@ export class DriveManager {
 
   public async saveFileInMessage (message: Message) {
     if (message.type() !== Message.Type.Attachment) {
-      log.verbose(PRE, `saveFileInMessage() skip save file since the message is not attachment type.`)
+      log.verbose(PRE, 'saveFileInMessage() skip save file since the message is not attachment type.')
       return
     }
 
     if (message.self()) {
-      log.verbose(PRE, `saveFileInMessage() skip save file since the message is sent by self.`)
+      log.verbose(PRE, 'saveFileInMessage() skip save file since the message is sent by self.')
       return
     }
 
     const room = message.room()
     if (!room) {
-      log.verbose(PRE, `saveFileInMessage() skip save file since the message is not in room.`)
+      log.verbose(PRE, 'saveFileInMessage() skip save file since the message is not in room.')
       return
     }
 
     const contact = message.from()
     if (!contact) {
-      log.verbose(PRE, `saveFileInMessage() skip save file since there is no contact for the message.`)
+      log.verbose(PRE, 'saveFileInMessage() skip save file since there is no contact for the message.')
       return
     }
     const path = `/${room.id}/${contact.id}/`
@@ -41,4 +41,5 @@ export class DriveManager {
     const result = await this.drive.searchFile(path, query)
     return result
   }
+
 }
