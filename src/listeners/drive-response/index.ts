@@ -64,10 +64,30 @@ export function matchResponse (text: string): DriveAction | null {
   return null
 }
 
+function actionToQuery(action: DriveAction): string|null {
+  if (action.action === 'list') {
+    return 'orderBy createdTime desc'
+  }
+  if (action.action === 'search' && action.keywords) {
+    const keywords = action.keywords.replace("'", '')
+    return `name contains '${keywords}' or fullText contains '${keywords}'`
+  }
+  return null
+}
+
 export default async function driveResponse (message: Message) {
   const text = message.text()
   const response = matchResponse(text)
   if (response) {
-    await message.say(JSON.stringify(response))
+    if (response.action === 'reply') {
+      if (response.text) {
+        await message.say(response.text)
+      }
+    } else {
+      const query = actionToQuery(response)
+      if (query) {
+        await message.say(JSON.stringify(response))
+      }
+    }
   }
 }
