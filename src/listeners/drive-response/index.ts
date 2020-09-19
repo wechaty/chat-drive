@@ -64,7 +64,7 @@ export function matchResponse (text: string): DriveAction | null {
   return null
 }
 
-function actionToQuery(action: DriveAction): string|null {
+function actionToQuery (action: DriveAction): string|null {
   if (action.action === 'list') {
     return 'orderBy createdTime desc'
   }
