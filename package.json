@@ -1,0 +1,34 @@
+{
+  "name": "chat-drive",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo dummy test",
+    "lint": "echo dummy lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wechaty/chat-drive.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0 License",
+  "bugs": {
+    "url": "https://github.com/wechaty/chat-drive/issues"
+  },
+  "homepage": "https://github.com/wechaty/chat-drive#readme",
+  "dependencies": {
+    "brolog": "^1.12.4",
+    "wechaty": "^0.48.10"
+  },
+  "git": {
+    "scripts": {
+      "pre-push": "npx git-scripts-pre-push"
+    }
+  },
+  "devDependencies": {
+    "@chatie/git-scripts": "^0.6.2",
+    "@chatie/tsconfig": "^0.10.1"
+  }
+}
