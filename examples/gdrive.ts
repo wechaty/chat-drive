@@ -139,7 +139,7 @@ async function main () {
   // name contains 'ROOMf0515c997b4cc2689d0e8b3ad1874eee'
 
   // const idList = await list("'1v1_cs2BF2ILDYYPuXjYKyHpwsP5BvUx3' in parents")
-  const idList = await list("name contains 'CONTACT'")
+  const idList = await list("fullText contains 'ROOMf0515c997b4cc2689d0e8b3ad1874eee'")
 
   console.info('idList', idList)
 

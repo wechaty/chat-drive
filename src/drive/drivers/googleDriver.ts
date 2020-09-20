@@ -26,7 +26,7 @@ export class GoogleDriver extends BaseDriver {
 
   // eslint-disable-next-line camelcase
   private drive: drive_v3.Drive
-  private folderId: string
+  private rootFolderId: string
 
   constructor (
     options: GoogleDriverOptions = {},
@@ -50,8 +50,8 @@ export class GoogleDriver extends BaseDriver {
       `)
     }
 
-    const folderId = options.folder || process.env.GOOGLE_SERVICE_ACCOUNT_FOLDER_ID
-    if (!folderId) {
+    const rootFolderId = options.root || process.env.GOOGLE_SERVICE_ACCOUNT_FOLDER_ID
+    if (!rootFolderId) {
       throw new Error(`
       options.folder or GOOGLE_SERVICE_ACCOUNT_FOLDER_ID must be set before using GDrive!
       See: https://github.com/wechaty/chat-drive#how-to-create-a-service-account
@@ -69,13 +69,60 @@ export class GoogleDriver extends BaseDriver {
       auth,
       version: 'v3',
     })
-    this.folderId = folderId
+    this.rootFolderId = rootFolderId
 
   }
 
-  async saveFile (fileBox: FileBox): Promise<void> {
-    log.verbose(PRE, `saveFile(${fileBox})`)
-    // TODO: wait for Huan to fill in this logic
+  private async folderId (folder: string): Promise<undefined | string> {
+    log.verbose(PRE, `folderId(${folder})`)
+    const res = await this.drive.files.list({
+      fields: 'files(id)',
+      q: [
+        `'${this.rootFolderId}' in parents`,
+        ' and ',
+        "mimeType = 'application/vnd.google-apps.folder'",
+        ' and ',
+        `name = ${folder}`,
+      ].join(''),
+    })
+
+    if (!res.data.files || res.data.files.length <= 0) {
+      return undefined
+    }
+
+    const idList = res.data.files.map(f => f.id)
+    for (const id of idList) {
+      if (id) return id
+    }
+    return undefined
+  }
+
+  private async folderCreate (name: string): Promise<string> {
+    log.verbose(PRE, `folderCreate(${name})`)
+    const res = await this.drive.files.create(
+      {
+        requestBody: {
+          mimeType: 'application/vnd.google-apps.folder',
+          name,
+          parents : [this.rootFolderId],
+        },
+      },
+    )
+
+    if (!res.data.id) {
+      throw new Error('folderCreate failed!')
+    }
+    return res.data.id
+  }
+
+  async saveFile (folder: string, fileBox: FileBox): Promise<void> {
+    log.verbose(PRE, `saveFile(${folder}, ${fileBox})`)
+
+    let folderId = await this.folderId(folder)
+
+    if (!folderId) {
+      folderId = await this.folderCreate(folder)
+    }
 
     await this.drive.files.create(
       {
@@ -83,22 +130,29 @@ export class GoogleDriver extends BaseDriver {
           body: await fileBox.toStream(),
         },
         requestBody: {
-          // mimeType: 'text/plain',
           name: fileBox.name,
-          parents: [this.folderId],
+          parents: [folderId],
         },
       },
     )
 
   }
 
-  async searchFile (query: string): Promise<DriveFile[]> {
-    log.verbose(PRE, `searchFile(${query})`)
-    // TODO: wait for Huan to fill in this logic
+  async searchFile (
+    folder: string,
+    query: string,
+  ): Promise<DriveFile[]> {
+    log.verbose(PRE, `searchFile(${folder}, ${query})`)
+
+    const folderId = await this.folderId(folder)
+    const folderQ = [
+      `'${folderId}' in parents`,
+      ' and ',
+    ].join('')
+
     const res = await this.drive.files.list({
       fields: 'files(id, name)',
-      // pageSize: 50,
-      q: query,
+      q: folderQ + ' ' + query,
     })
 
     const driveFileList: DriveFile[] = res.data.files?.map(f => ({
