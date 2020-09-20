@@ -24,7 +24,7 @@ export class FSDriver extends BaseDriver {
 
   public async searchFile (query: string): Promise<DriveFile[]> {
     log.verbose(PRE, `searchFile(${query})`)
-    const files = await fs.readdir(this.options.folder)
+    const files = await fs.readdir(this.options.folder!)
     const targetFiles = files.filter(f => RegExp(query).test(f))
 
     return targetFiles.map(f => ({

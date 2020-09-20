@@ -6,7 +6,7 @@ export interface DriveFile {
 }
 
 export interface BaseDriverOptions {
-  folder: string,
+  folder?: string,
 }
 
 export abstract class BaseDriver {

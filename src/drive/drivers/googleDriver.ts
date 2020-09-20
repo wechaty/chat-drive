@@ -17,23 +17,43 @@ const SCOPES = [
   'https://www.googleapis.com/auth/drive',
 ]
 
+interface GoogleDriverOptions extends BaseDriverOptions {
+  clientEmail?: string,
+  privateKey?: string,
+}
+
 export class GoogleDriver extends BaseDriver {
 
   // eslint-disable-next-line camelcase
   private drive: drive_v3.Drive
+  private folderId: string
 
   constructor (
-    protected options: BaseDriverOptions,
+    options: GoogleDriverOptions = {},
   ) {
     super(options)
     log.verbose(PRE, 'constructor(%s)', JSON.stringify(options))
 
-    const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL
-    const privateKey  = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
-
-    if (!clientEmail || !privateKey) {
+    const clientEmail = options.clientEmail || process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL
+    if (!clientEmail) {
       throw new Error(`
-      GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL & GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY must be set before using GDrive!
+      options.clientEmail or process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL must be set before using GDrive!
+      See: https://github.com/wechaty/chat-drive#how-to-create-a-service-account
+      `)
+    }
+
+    const privateKey = options.privateKey || process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+    if (!privateKey) {
+      throw new Error(`
+      options.privateKey or GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY must be set before using GDrive!
+      See: https://github.com/wechaty/chat-drive#how-to-create-a-service-account
+      `)
+    }
+
+    const folderId = options.folder || process.env.GOOGLE_SERVICE_ACCOUNT_FOLDER_ID
+    if (!folderId) {
+      throw new Error(`
+      options.folder or GOOGLE_SERVICE_ACCOUNT_FOLDER_ID must be set before using GDrive!
       See: https://github.com/wechaty/chat-drive#how-to-create-a-service-account
       `)
     }
@@ -49,6 +69,8 @@ export class GoogleDriver extends BaseDriver {
       auth,
       version: 'v3',
     })
+    this.folderId = folderId
+
   }
 
   async saveFile (fileBox: FileBox): Promise<void> {
@@ -63,7 +85,7 @@ export class GoogleDriver extends BaseDriver {
         requestBody: {
           // mimeType: 'text/plain',
           name: fileBox.name,
-          parents: [this.options.folder],
+          parents: [this.folderId],
         },
       },
     )
