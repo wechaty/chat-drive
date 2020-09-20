@@ -81,11 +81,13 @@ async function listFiles (): Promise<string[]> {
 }
 
 async function list (q?: string): Promise<string[]> {
-  const res = await drive.files.list({
+  const options = {
     fields: 'files(id)',
     // pageSize: 50,
-    q: q ?? 'not trashed',
-  })
+    q: q ?? 'trashed = false',
+  }
+  console.info('options', options)
+  const res = await drive.files.list(options)
   const idList = res.data.files?.map(f => f.id) || []
   return idList.filter(validId)
 }
@@ -133,12 +135,24 @@ async function upload () {
 
 async function main () {
   // await upload()
-  const idList = await list("name contains 'gdrive'")
+  // ROOMf0515c997b4cc2689d0e8b3ad1874eee_CONTACT258d239031db8d4343e5e8af97760ebf_5c6938760bdf005a52391505_1589810671021_Open%20Source%20Wechaty%20Rui(154)(3).pdf
+  // name contains 'ROOMf0515c997b4cc2689d0e8b3ad1874eee'
+
+  // const idList = await list("'1v1_cs2BF2ILDYYPuXjYKyHpwsP5BvUx3' in parents")
+  const idList = await list("name contains 'CONTACT'")
+
   console.info('idList', idList)
 
   for (const fileId of idList) {
     const schema = await fileIdToSchema(fileId)
-    console.info('schema for ', fileId, schema.appProperties, schema.properties, schema.parents, schema.originalFilename)
+    console.info(
+      'name:', schema.name,
+      '\n\tfileId:', fileId,
+      '\n\tappProperties:', schema.appProperties,
+      '\n\tproperties:', schema.properties,
+      '\n\tparents:', schema.parents,
+      '\n\toriginalFilename:', schema.originalFilename,
+    )
   }
 
   // for (const id of idList) {
