@@ -6,7 +6,7 @@ export interface DriveFile {
 }
 
 export interface BaseDriverOptions {
-  folder?: string,
+  root?: string,
 }
 
 export abstract class BaseDriver {
@@ -14,8 +14,8 @@ export abstract class BaseDriver {
   constructor (protected options: BaseDriverOptions) {
   }
 
-  public abstract async saveFile (fileBox: FileBox): Promise<void>
-  public abstract async searchFile (query: string): Promise<DriveFile[]>
+  public abstract async saveFile (folder: string, fileBox: FileBox): Promise<void>
+  public abstract async searchFile (folder: string, query: string): Promise<DriveFile[]>
   public abstract async getFile (key: string): Promise<FileBox>
 
 }
