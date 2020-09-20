@@ -42,6 +42,7 @@ Once upon a time...
 1. [How to Use the Google Drive API with JavaScript](https://medium.com/@bretcameron/how-to-use-the-google-drive-api-with-javascript-57a6cc9e5262)
 1. [Wrapper to simplify interaction with google drive apis](https://github.com/rainabba/node-cloudfs-drive)
 1. [Node.js library to access Google Drive's API](https://github.com/niftylettuce/node-google-drive)
+1. [Google Drive API: Files and folders overview](https://developers.google.com/drive/api/v3/about-files#file_organization)
 
 ## Contributors
 

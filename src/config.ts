@@ -1,3 +1,3 @@
-import { log } from 'brolog'
+import { log } from 'wechaty'
 
 export { log }

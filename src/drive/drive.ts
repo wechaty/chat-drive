@@ -13,7 +13,7 @@ export class Drive {
   public constructor (driverType = 'fs') {
     switch (driverType) {
       case 'fs':
-        this.driver = new FSDriver()
+        this.driver = new FSDriver({ folder: '/tmp' })
         break
 
       case 'google':
