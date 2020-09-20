@@ -137,7 +137,8 @@ async function main () {
   console.info('idList', idList)
 
   for (const fileId of idList) {
-    console.info('schema for ', fileId, await fileIdToSchema(fileId))
+    const schema = await fileIdToSchema(fileId)
+    console.info('schema for ', fileId, schema.appProperties, schema.properties, schema.parents, schema.originalFilename)
   }
 
   // for (const id of idList) {

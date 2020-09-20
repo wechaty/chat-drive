@@ -1,32 +1,34 @@
 import fs from 'fs-extra'
-import path from 'path'
 import { FileBox } from 'wechaty'
 
-import { BaseDriver, DriveFile } from './baseDriver'
+import {
+  BaseDriver,
+  BaseDriverOptions,
+  DriveFile,
+}                   from './baseDriver'
 import { log } from '../../config'
 
 const PRE = 'FSDriver'
-const DRIVE_FOLDER_NAME = 'fs-drive'
-const FILE_FOLDER = path.join(__dirname, '..', '..', '..', DRIVE_FOLDER_NAME)
 
 export class FSDriver extends BaseDriver {
 
-  public async saveFile (filePath: string, fileBox: FileBox) {
-    log.verbose(PRE, `saveFile(${path}, ${fileBox})`)
-    const fullPath = this.getFullPath(filePath)
-    const name = fileBox.name
-    await fs.mkdirp(fullPath)
-    await fileBox.toFile(`${fullPath}/${name}`, true)
+  constructor (protected options: BaseDriverOptions) {
+    super(options)
   }
 
-  public async searchFile (filePath: string, query: string): Promise<DriveFile[]> {
-    log.verbose(PRE, `searchFile(${filePath}, ${query})`)
-    const fullPath = this.getFullPath(filePath)
-    const files = await fs.readdir(fullPath)
+  public async saveFile (fileBox: FileBox) {
+    log.verbose(PRE, `saveFile(${fileBox})`)
+    const name = fileBox.name
+    await fileBox.toFile(`${this.options.folder}/${name}`, true)
+  }
+
+  public async searchFile (query: string): Promise<DriveFile[]> {
+    log.verbose(PRE, `searchFile(${query})`)
+    const files = await fs.readdir(this.options.folder!)
     const targetFiles = files.filter(f => RegExp(query).test(f))
 
     return targetFiles.map(f => ({
-      key: `${fullPath}/${f}`,
+      key: `${this.options.folder}/${f}`,
       name: f,
     }))
   }
@@ -35,11 +37,6 @@ export class FSDriver extends BaseDriver {
     log.verbose(PRE, `getFile(${key})`)
     const fileBox = FileBox.fromFile(key)
     return fileBox
-  }
-
-  private getFullPath (filePath: string) {
-    const fullPath = path.join(FILE_FOLDER, filePath)
-    return fullPath
   }
 
 }
