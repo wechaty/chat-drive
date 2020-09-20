@@ -31,14 +31,18 @@ export class DriveManager {
       log.verbose(PRE, 'saveFileInMessage() skip save file since there is no contact for the message.')
       return
     }
-    const path = `/${room.id}/${contact.id}/`
+
     const fileBox = await message.toFileBox()
-    await this.drive.saveFile(path, fileBox)
+
+    // TODO(huan): construct the query string
+    fileBox.name = `${room.id}_${contact.id}_xxx`
+
+    await this.drive.saveFile(fileBox)
   }
 
   public async searchFileInRoom (room: Room, query: string) {
-    const path = `/${room.id}`
-    const result = await this.drive.searchFile(path, query)
+    void room // TODO(huan): use room to construct the query
+    const result = await this.drive.searchFile(query)
     return result
   }
 

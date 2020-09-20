@@ -13,24 +13,23 @@ const mockName3 = 'test5.png'
 const projectRoot = path.join(__dirname, '..', '..', '..')
 const driveRoot = path.join(projectRoot, 'fs-drive')
 const fullPath =  path.join(driveRoot, 'roomid', 'contactid')
-const curPath = '/roomid/contactid'
 
 test.only('should save file correctly', async t => {
   const fileBox = FileBox.fromUrl(mockFileUrl)
   await fileBox.ready()
 
-  const driver = new FSDriver()
-  await driver.saveFile(curPath, fileBox)
+  const driver = new FSDriver({ folder: '/tmp' })
+  await driver.saveFile(fileBox)
 
   const savedFile = FileBox.fromFile(`${fullPath}/test.jpg`)
   t.assert(savedFile)
 
   fileBox.name = mockName2
-  await driver.saveFile(curPath, fileBox)
+  await driver.saveFile(fileBox)
   fileBox.name = mockName3
-  await driver.saveFile(curPath, fileBox)
+  await driver.saveFile(fileBox)
 
-  const files = await driver.searchFile(curPath, 'test')
+  const files = await driver.searchFile('test')
   t.assert(files.length === 2)
 
   const fileBoxes = await Promise.all(files.map(f => driver.getFile(f.key)))
