@@ -1,3 +1,5 @@
+import './config' // load .env
+
 import { Wechaty } from 'wechaty'
 import { EventLogger, QRCodeTerminal } from 'wechaty-plugin-contrib'
 
