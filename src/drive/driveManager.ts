@@ -1,4 +1,4 @@
-import { Message, Room } from 'wechaty'
+import { Message, Room, FileBox } from 'wechaty'
 
 import { log } from '../config'
 import { Drive } from './drive'
@@ -41,6 +41,10 @@ export class DriveManager {
     const folder = room.id
     const result = await this.drive.searchFile(folder, query)
     return result
+  }
+
+  public async getFile (fileId: string): Promise<FileBox> {
+    return this.drive.getFile(fileId)
   }
 
 }

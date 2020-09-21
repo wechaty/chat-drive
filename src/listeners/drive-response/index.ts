@@ -1,5 +1,5 @@
 
-import { Message } from 'wechaty'
+import { Message, FileBox } from 'wechaty'
 import parseDate from './parse-date'
 import parseNumber from './parse-number'
 import keywordsGenerate from './keywords-generate'
@@ -88,7 +88,7 @@ export function matchResponse (text: string): DriveAction | null {
 
 function actionToQuery (text: string, action: DriveAction): string|null {
   if (action.action === 'list') {
-    return ''
+    return 'trashed = false'
   }
   if (action.action === 'search' && action.keywords) {
     const keywords = action.keywords.replace("'", '')
@@ -128,9 +128,16 @@ export default async function driveResponse (message: Message) {
     } else {
       const query = actionToQuery(text, response)
       log.verbose('driveResponse', `query ${query ? query.toString() : 'no_query'}`)
-      if (query) {
-        const ret = manager.searchFileInRoom(room, query)
-        await message.say(JSON.stringify(ret))
+      if (typeof query === 'string') {
+        const ret = await manager.searchFileInRoom(room, query)
+        // await message.say(JSON.stringify(ret))
+        if (ret) {
+          const fileBox = await manager.getFile(ret[0].key)
+          const fileToSay = FileBox.fromBase64(await fileBox.toBase64(), fileBox.name)
+          await message.say(fileToSay)
+        } else {
+          await message.say('找不到文件')
+        }
       }
     }
   } else {
