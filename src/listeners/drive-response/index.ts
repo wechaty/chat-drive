@@ -1,7 +1,12 @@
+
 import { Message } from 'wechaty'
 import parseDate from './parse-date'
 import parseNumber from './parse-number'
 import keywordsGenerate from './keywords-generate'
+import { DriveManager } from '../../drive/driveManager'
+import { log } from '../../config'
+
+const manager = new DriveManager()
 
 interface DriveAction {
   action: 'search' | 'list' | 'reply',
@@ -83,7 +88,7 @@ export function matchResponse (text: string): DriveAction | null {
 
 function actionToQuery (text: string, action: DriveAction): string|null {
   if (action.action === 'list') {
-    return 'orderBy createdTime desc'
+    return ''
   }
   if (action.action === 'search' && action.keywords) {
     const keywords = action.keywords.replace("'", '')
@@ -109,16 +114,26 @@ function actionToQuery (text: string, action: DriveAction): string|null {
 export default async function driveResponse (message: Message) {
   const text = await message.mentionText()
   const response = matchResponse(text)
+  const room = message.room()
+  if (!room) {
+    log.verbose('driveResponse', 'no room')
+    return
+  }
   if (response) {
     if (response.action === 'reply') {
+      log.verbose('driveResponse', `reply ${response.text || 'no_text'}`)
       if (response.text) {
         await message.say(response.text)
       }
     } else {
       const query = actionToQuery(text, response)
+      log.verbose('driveResponse', `query ${query ? query.toString() : 'no_query'}`)
       if (query) {
-        await message.say(query)
+        const ret = manager.searchFileInRoom(room, query)
+        await message.say(JSON.stringify(ret))
       }
     }
+  } else {
+    log.verbose('driveResponse', 'no response')
   }
 }
