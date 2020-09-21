@@ -26,7 +26,24 @@ export class GoogleDriver extends BaseDriver {
 
   // eslint-disable-next-line camelcase
   private drive: drive_v3.Drive
-  private rootFolderId: string
+  private rootFolderName: string
+
+  private _rootFolderId?: string
+  private get rootFolderId (): Promise<string> {
+    if (this._rootFolderId) {
+      return Promise.resolve(this._rootFolderId)
+    }
+
+    const future = this.folderId(this.rootFolderName, true)
+      .then(id => {
+        if (id) {
+          this._rootFolderId = id
+          return id
+        }
+        throw new Error(`Can not find GDrive Folder ${this.rootFolderName}`)
+      })
+    return future
+  }
 
   constructor (
     options: GoogleDriverOptions = {},
@@ -42,18 +59,19 @@ export class GoogleDriver extends BaseDriver {
       `)
     }
 
-    const privateKey = options.privateKey || process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+    let privateKey = options.privateKey || process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
     if (!privateKey) {
       throw new Error(`
       options.privateKey or GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY must be set before using GDrive!
       See: https://github.com/wechaty/chat-drive#how-to-create-a-service-account
       `)
     }
+    privateKey = privateKey.replace(/\\n/g, '\n')
 
-    const rootFolderId = options.root || process.env.GOOGLE_SERVICE_ACCOUNT_FOLDER_ID
-    if (!rootFolderId) {
+    const rootFolderName = options.root || process.env.GOOGLE_SERVICE_ACCOUNT_FOLDER_NAME
+    if (!rootFolderName) {
       throw new Error(`
-      options.folder or GOOGLE_SERVICE_ACCOUNT_FOLDER_ID must be set before using GDrive!
+      options.folder or GOOGLE_SERVICE_ACCOUNT_FOLDER_NAME must be set before using GDrive!
       See: https://github.com/wechaty/chat-drive#how-to-create-a-service-account
       `)
     }
@@ -69,26 +87,35 @@ export class GoogleDriver extends BaseDriver {
       auth,
       version: 'v3',
     })
-    this.rootFolderId = rootFolderId
+    this.rootFolderName = rootFolderName
 
   }
 
-  private async folderId (folder: string): Promise<undefined | string> {
-    log.verbose(PRE, `folderId(${folder})`)
+  protected async folderId (name: string, root = false): Promise<undefined | string> {
+    log.verbose(PRE, `folderId(${name}, ${root})`)
+
+    const parentId = root
+      ? 'root'
+      : await this.rootFolderId
+
+    const q = [
+      `'${parentId}' in parents`,
+      ' and ',
+      "mimeType = 'application/vnd.google-apps.folder'",
+      ' and ',
+      `name = '${name}'`,
+    ].join('')
+
     const res = await this.drive.files.list({
       fields: 'files(id)',
-      q: [
-        `'${this.rootFolderId}' in parents`,
-        ' and ',
-        "mimeType = 'application/vnd.google-apps.folder'",
-        ' and ',
-        `name = ${folder}`,
-      ].join(''),
+      q,
     })
 
     if (!res.data.files || res.data.files.length <= 0) {
       return undefined
     }
+
+    console.info('files', res.data.files)
 
     const idList = res.data.files.map(f => f.id)
     for (const id of idList) {
@@ -97,14 +124,14 @@ export class GoogleDriver extends BaseDriver {
     return undefined
   }
 
-  private async folderCreate (name: string): Promise<string> {
+  protected async folderCreate (name: string): Promise<string> {
     log.verbose(PRE, `folderCreate(${name})`)
     const res = await this.drive.files.create(
       {
         requestBody: {
           mimeType: 'application/vnd.google-apps.folder',
           name,
-          parents : [this.rootFolderId],
+          parents : [await this.rootFolderId],
         },
       },
     )

@@ -13,7 +13,7 @@ export class Drive {
   public constructor (driverType = 'fs') {
     switch (driverType) {
       case 'fs':
-        this.driver = new FSDriver({ folder: '/tmp' })
+        this.driver = new FSDriver({ root: '/tmp' })
         break
 
       case 'google':
@@ -25,12 +25,12 @@ export class Drive {
     }
   }
 
-  public async saveFile (fileBox: FileBox) {
-    await this.driver.saveFile(fileBox)
+  public async saveFile (folder: string, fileBox: FileBox) {
+    await this.driver.saveFile(folder, fileBox)
   }
 
-  public async searchFile (query: string) {
-    return this.driver.searchFile(query)
+  public async searchFile (folder: string, query: string) {
+    return this.driver.searchFile(folder, query)
   }
 
 }

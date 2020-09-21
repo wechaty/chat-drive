@@ -36,13 +36,14 @@ export class DriveManager {
 
     // TODO(huan): construct the query string
     fileBox.name = `${room.id}_${contact.id}_xxx`
-
-    await this.drive.saveFile(fileBox)
+    const folder = 'xxx@chatroom'
+    await this.drive.saveFile(folder, fileBox)
   }
 
   public async searchFileInRoom (room: Room, query: string) {
     void room // TODO(huan): use room to construct the query
-    const result = await this.drive.searchFile(query)
+    const folder = 'xxx@chatroom'
+    const result = await this.drive.searchFile(folder, query)
     return result
   }
 
