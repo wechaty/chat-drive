@@ -26,24 +26,7 @@ export class GoogleDriver extends BaseDriver {
 
   // eslint-disable-next-line camelcase
   private drive: drive_v3.Drive
-  private rootFolderName: string
-
-  private _rootFolderId?: string
-  private get rootFolderId (): Promise<string> {
-    if (this._rootFolderId) {
-      return Promise.resolve(this._rootFolderId)
-    }
-
-    const future = this.folderId(this.rootFolderName, true)
-      .then(id => {
-        if (id) {
-          this._rootFolderId = id
-          return id
-        }
-        throw new Error(`Can not find GDrive Folder ${this.rootFolderName}`)
-      })
-    return future
-  }
+  private rootFolderId: string
 
   constructor (
     options: GoogleDriverOptions = {},
@@ -68,10 +51,10 @@ export class GoogleDriver extends BaseDriver {
     }
     privateKey = privateKey.replace(/\\n/g, '\n')
 
-    const rootFolderName = options.root || process.env.GOOGLE_SERVICE_ACCOUNT_FOLDER_NAME
-    if (!rootFolderName) {
+    const rootFolderId = options.root || process.env.GOOGLE_SERVICE_ACCOUNT_FOLDER_ID
+    if (!rootFolderId) {
       throw new Error(`
-      options.folder or GOOGLE_SERVICE_ACCOUNT_FOLDER_NAME must be set before using GDrive!
+      options.root or GOOGLE_SERVICE_ACCOUNT_FOLDER_ID must be set before using GDrive!
       See: https://github.com/wechaty/chat-drive#how-to-create-a-service-account
       `)
     }
@@ -87,37 +70,36 @@ export class GoogleDriver extends BaseDriver {
       auth,
       version: 'v3',
     })
-    this.rootFolderName = rootFolderName
-
+    this.rootFolderId = rootFolderId
   }
 
-  protected async folderId (name: string, root = false): Promise<undefined | string> {
-    log.verbose(PRE, `folderId(${name}, ${root})`)
-
-    const parentId = root
-      ? 'root'
-      : await this.rootFolderId
+  protected async folderId (name: string): Promise<undefined | string> {
+    log.verbose(PRE, `folderId(${name})`)
 
     const q = [
-      `'${parentId}' in parents`,
+      `'${this.rootFolderId}' in parents`,
       ' and ',
       "mimeType = 'application/vnd.google-apps.folder'",
       ' and ',
       `name = '${name}'`,
     ].join('')
 
+    // console.info('q:', q)
+
     const res = await this.drive.files.list({
-      fields: 'files(id)',
+      fields: 'files(id, name, parents, mimeType)',
       q,
     })
+
+    // console.info('###')
+    // console.info('data:', res.data)
 
     if (!res.data.files || res.data.files.length <= 0) {
       return undefined
     }
 
-    console.info('files', res.data.files)
-
     const idList = res.data.files.map(f => f.id)
+
     for (const id of idList) {
       if (id) return id
     }
@@ -151,7 +133,7 @@ export class GoogleDriver extends BaseDriver {
       folderId = await this.folderCreate(folder)
     }
 
-    await this.drive.files.create(
+    const res = await this.drive.files.create(
       {
         media: {
           body: await fileBox.toStream(),
@@ -163,13 +145,16 @@ export class GoogleDriver extends BaseDriver {
       },
     )
 
+    if (!res.data.id) {
+      throw new Error('save file failed for ' + fileBox.name)
+    }
   }
 
   async searchFile (
     folder: string,
     query: string,
   ): Promise<DriveFile[]> {
-    log.verbose(PRE, `searchFile(${folder}, ${query})`)
+    log.verbose(PRE, `searchFile(${folder}, "${query}")`)
 
     const folderId = await this.folderId(folder)
     const folderQ = [
@@ -177,10 +162,15 @@ export class GoogleDriver extends BaseDriver {
       ' and ',
     ].join('')
 
+    const q = folderQ + ' ' + query
+    console.info('q:', q)
+
     const res = await this.drive.files.list({
       fields: 'files(id, name)',
-      q: folderQ + ' ' + query,
+      q,
     })
+
+    console.info('res.data:', res.data)
 
     const driveFileList: DriveFile[] = res.data.files?.map(f => ({
       key:  f.id,
