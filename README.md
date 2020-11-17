@@ -44,6 +44,10 @@ Once upon a time...
 1. [Node.js library to access Google Drive's API](https://github.com/niftylettuce/node-google-drive)
 1. [Google Drive API: Files and folders overview](https://developers.google.com/drive/api/v3/about-files#file_organization)
 
+## Similiar Products
+
+1. [Accelerate Work - A free browser extension to help you find docs, notes and wikis, fast.](https://obie.ai/personal/)
+
 ## Contributors
 
 [![Hall of Flame](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/0)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/0)[![Hall of Flame](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/1)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/1)[![Hall of Flame](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/2)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/2)[![Hall of Flame](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/3)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/3)[![Hall of Flame](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/4)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/4)[![Hall of Flame](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/5)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/5)[![Hall of Flame](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/6)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/6)[![Hall of Flame](https://sourcerer.io/fame/huan/wechaty/chat-drive/images/7)](https://sourcerer.io/fame/huan/wechaty/chat-drive/links/7)
